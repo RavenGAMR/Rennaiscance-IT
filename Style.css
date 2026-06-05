@@ -1,1 +1,106 @@
+﻿html,
+body {
+    height: 100%;
+}
 
+body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+.navbar {
+    background-color: transparent !important;
+    padding: 0.9rem 1.25rem;
+}
+
+.navbar-brand {
+    margin-left: 1.25rem;
+    font-size: 1.65rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.navbar .navbar-collapse {
+    justify-content: flex-end;
+}
+
+.navbar .navbar-nav .nav-link {
+    font-size: 1.05rem;
+    padding: 0.45rem 0.75rem;
+}
+
+.navbar .navbar-toggler {
+    margin-left: 0.5rem;
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link {
+    color: #212529;
+}
+
+.navbar .nav-link.active,
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+    color: #0d6efd;
+}
+
+.page-footer {
+    background-color: #343a40;
+    font-size: 1.05rem;
+}
+
+.page-footer a {
+    color: #f8f9fa;
+    text-decoration: none;
+    font-size: 1.05rem;
+}
+
+.page-footer a:hover,
+.page-footer a:focus {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding-left: 0;
+}
+
+.footer-links li {
+    display: block;
+}
+
+.article-card {
+    min-height: 320px;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.article-card-image {
+    min-height: 180px;
+    background-color: #e9ecef;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.article-card .card-body {
+    padding: 1.5rem;
+}
+
+.article-card .card-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+}
