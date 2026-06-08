@@ -4,13 +4,22 @@ $error = '';
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $u = $_POST['username'] ?? $_POST['email'] ?? '';
     $p = $_POST['password'] ?? '';
+    $return = $_POST['return'] ?? $_GET['return'] ?? 'Index.php';
+    $return_decoded = urldecode($return);
+    // make relative return site-relative if needed
+    if(!preg_match('#^https?://#i', $return_decoded) && strlen($return_decoded) && $return_decoded[0] !== '/'){
+        $base = rtrim(dirname($_SERVER['REQUEST_URI']), '/');
+        $return_location = $base . '/' . ltrim($return_decoded, '/');
+    } else {
+        $return_location = $return_decoded ?: 'Index.php';
+    }
     if(loginUser($u,$p)){
         $user = currentUser();
         if($user && $user['role'] === 'admin'){
             header('Location: Admin.php');
             exit;
         }
-        header('Location: Index.php');
+        header('Location: ' . $return_location);
         exit;
     }
     $error = 'Invalid credentials';
@@ -40,6 +49,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                             <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                         <?php endif; ?>
                         <form action="login.php" method="post">
+                            <input type="hidden" name="return" value="<?php echo htmlspecialchars($_GET['return'] ?? 'Index.php'); ?>">
                             <div class="mb-3">
                                 <label for="email" class="form-label">E-mail</label>
                                 <input type="email" class="form-control" id="email" name="email" placeholder="jouw@email.com" required>
@@ -57,7 +67,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Inloggen</button>
                         </form>
-                        <p class="text-center mt-4 mb-0">Nog geen account? <a href="Contact.php">Neem contact op</a></p>
+                        <p class="text-center mt-4 mb-0">Nog geen account? <a href="register.php">Registreer hier</a></p>
                     </div>
                 </div>
             </div>
@@ -102,6 +112,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                             <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                         <?php endif; ?>
                         <form method="post">
+                            <input type="hidden" name="return" value="<?php echo htmlspecialchars($_GET['return'] ?? 'Index.php'); ?>">
                             <div class="mb-3">
                                 <label class="form-label">Username</label>
                                 <input name="username" class="form-control" required>

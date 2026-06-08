@@ -49,6 +49,21 @@ INSERT INTO `articles` (`title`,`slug`,`content`) VALUES
 ('Weblogartikel 1','weblogartikel1','This is the content for weblog article 1 stored in the database.'),
 ('Weblogartikel 2','weblogartikel2','This is the content for weblog article 2 stored in the database.');
 
+-- Sample test user (generate the password hash with PHP and replace <hashed_password_here>)
+-- Example to generate a hash for password 'testpass':
+-- php -r "echo password_hash('testpass', PASSWORD_DEFAULT)."\n";
+-- Then run the INSERT replacing <hashed_password_here> with the produced hash.
+-- INSERT INTO `users` (`username`,`email`,`password`,`role`) VALUES ('test2','test2@example.com','<hashed_password_here>','user');
+
+-- Insert a sample purchase for test2 (only inserts if the user exists and the purchase doesn't already exist)
+-- This will add the product 'weblogartikel1' for user 'test2'
+INSERT INTO purchases (user_id, product)
+SELECT u.id, 'weblogartikel1' FROM users u
+WHERE u.username = 'test2'
+  AND NOT EXISTS (
+    SELECT 1 FROM purchases p WHERE p.user_id = u.id AND p.product = 'weblogartikel1'
+  );
+
 -- Notes:
 -- - The SQL does not insert an admin user with a plaintext password. Generate a bcrypt-compatible hash with PHP as shown above.
 -- - If you prefer the DB name to be different, change the CREATE DATABASE / USE lines accordingly.
