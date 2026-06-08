@@ -1,3 +1,21 @@
+<?php
+require_once __DIR__ . '/auth.php';
+$error = '';
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    $u = $_POST['username'] ?? $_POST['email'] ?? '';
+    $p = $_POST['password'] ?? '';
+    if(loginUser($u,$p)){
+        $user = currentUser();
+        if($user && $user['role'] === 'admin'){
+            header('Location: Admin.php');
+            exit;
+        }
+        header('Location: Index.php');
+        exit;
+    }
+    $error = 'Invalid credentials';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,6 +36,9 @@
                 <div class="card sha    dow-sm border-0">
                     <div class="card-body p-4">
                         <h2 class="h4 text-center mb-4">Inloggen</h2>
+                        <?php if(!empty($error)): ?>
+                            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+                        <?php endif; ?>
                         <form action="login.php" method="post">
                             <div class="mb-3">
                                 <label for="email" class="form-label">E-mail</label>
@@ -55,26 +76,8 @@
             </ul>
         </div>
     </footer>
-</body>
-</html>
-<?php
-require_once __DIR__ . '/auth.php';
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
-    $u = $_POST['username'] ?? $_POST['email'] ?? '';
-    $p = $_POST['password'] ?? '';
-    if(loginUser($u,$p)){
-        $user = currentUser();
-        if($user && $user['role'] === 'admin'){
-            header('Location: Admin.php');
-            exit;
-        }
-        header('Location: Index.php');
-        exit;
-    }
-    $error = 'Invalid credentials';
-}
-?>
-<!doctype html>
+    </body>
+    </html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -87,33 +90,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
 
-    <nav class="navbar navbar-expand-sm navbar-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="Index.php">Rennaiscance</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarID"
-                aria-controls="navbarID" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarID">
-                <div class="navbar-nav ms-auto">
-                    <?php $u = currentUser(); ?>
-                    <a class="nav-link" href="Index.php">Home</a>
-                    <a class="nav-link" href="Weblog.php">Weblog</a>
-                    <a class="nav-link" href="Helpdesk.php">Helpdesk</a>
-                    <a class="nav-link" href="Contact.php">Contact</a>
-                    <?php if($u): ?>
-                        <?php if($u['role'] === 'admin'): ?>
-                            <a class="nav-link" href="Admin.php">Admin</a>
-                        <?php endif; ?>
-                        <a class="nav-link" href="logout.php">Logout (<?php echo htmlspecialchars($u['username']); ?>)</a>
-                    <?php else: ?>
-                        <a class="nav-link active" href="login.php">Login</a>
-                        <a class="nav-link" href="register.php">Register</a>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </nav>
+<?php include 'navbar.php'; ?>
 
     <main class="container py-5">
         <div class="row justify-content-center">

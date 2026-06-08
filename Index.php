@@ -34,7 +34,6 @@
                         <a class="nav-link" href="logout.php">Logout (<?php echo htmlspecialchars($u['username']); ?>)</a>
                     <?php else: ?>
                         <a class="nav-link" href="login.php">Login</a>
-                        <a class="nav-link" href="register.php">Register</a>
                     <?php endif; ?>
                 </div>
             </div>

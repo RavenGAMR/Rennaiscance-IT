@@ -1,7 +1,3 @@
-
-@ -1 +1,37 @@
-<<<<<<< Updated upstream
-=======
 <?php
 require_once __DIR__ . '/auth.php';
 requireAdmin();
@@ -35,4 +31,3 @@ requireAdmin();
             </div>
         </div>
     </nav>
->>>>>>> Stashed changes

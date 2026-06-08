@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/auth.php'; ?>
 <nav class="navbar navbar-expand-sm navbar-light bg-white shadow-sm">
     <div class="container-fluid">
         <a class="navbar-brand" href="Index.php">
@@ -8,12 +9,23 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarID">
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link active" aria-current="page" href="Index.php">Home</a>
-                <a class="nav-link" href="Weblog.php">Weblog</a>
-                <a class="nav-link" href="Helpdesk.php">Helpdesk</a>
-                <a class="nav-link" href="Contact.php">Contact</a>
+                <div class="navbar-nav ms-auto">
+                    <?php $u = currentUser(); ?>
+                    <a class="nav-link" href="Index.php">Home</a>
+                    <a class="nav-link" href="Weblog.php">Weblog</a>
+                    <a class="nav-link" href="Helpdesk.php">Helpdesk</a>
+                    <a class="nav-link" href="Contact.php">Contact</a>
+                    <?php if($u): ?>
+                        <?php if($u['role'] === 'admin'): ?>
+                            <a class="nav-link" href="Admin.php">Admin</a>
+                        <?php endif; ?>
+                        <a class="nav-link" href="logout.php">Logout (<?php echo htmlspecialchars($u['username']); ?>)</a>
+                    <?php else: ?>
+                        <a class="nav-link active" href="login.php">Login</a>
+                    <?php endif; ?>
+                </div>
             </div>
-        </div>
     </div>
 </nav>
+
+
