@@ -19,29 +19,25 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarID">
                 <div class="navbar-nav ms-auto">
+                    <?php
+                    require_once __DIR__ . '/auth.php';
+                    $u = currentUser();
+                    ?>
                     <a class="nav-link active" aria-current="page" href="Index.php">Home</a>
                     <a class="nav-link" href="Weblog.php">Weblog</a>
                     <a class="nav-link" href="Helpdesk.php">Helpdesk</a>
                     <a class="nav-link" href="Contact.php">Contact</a>
+                    <?php if($u): ?>
+                        <?php if($u['role'] === 'admin'): ?>
+                            <a class="nav-link" href="Admin.php">Admin</a>
+                        <?php endif; ?>
+                        <a class="nav-link" href="logout.php">Logout (<?php echo htmlspecialchars($u['username']); ?>)</a>
+                    <?php else: ?>
+                        <a class="nav-link" href="login.php">Login</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="container py-5">
 
-    </main>
-
-    <footer class="page-footer text-center text-white py-4">
-        <div class="container">
-            <p class="mb-3"></p>
-            <ul class="footer-links mb-0">
-                <li><a href="Weblog.php">Weblog</a></li>
-                <li><a href="Verwerkingsovereenkomst.php">Verwerkingsovereenkomst</a></li>
-                <li><a href="Privacypolicy.php">Privacypolicy</a></li>
-                <li><a href="Contact.php">Contact</a></li>
-            </ul>
-        </div>
-    </footer>
-</body>
-</html>
