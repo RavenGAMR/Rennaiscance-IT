@@ -2,17 +2,23 @@
 session_start();
 require_once __DIR__ . '/db.php';
 
-function registerUser($username, $password, $role = 'user'){
+function registerUser($username, $password, $role = 'user', $email = null){
     $pdo = getPDO();
     $hash = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare("INSERT INTO users (username,password,role) VALUES (?, ?, ?)");
-    return $stmt->execute([$username, $hash, $role]);
+    $stmt = $pdo->prepare("INSERT INTO users (username,email,password,role) VALUES (?, ?, ?, ?)");
+    try {
+        return $stmt->execute([$username, $email, $hash, $role]);
+    } catch (PDOException $e) {
+        // Duplicate username or email will trigger an exception (integrity constraint).
+        // Return false so the caller can handle the error gracefully.
+        return false;
+    }
 }
 
 function loginUser($username, $password){
     $pdo = getPDO();
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
-    $stmt->execute([$username]);
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1");
+    $stmt->execute([$username, $username]);
     $user = $stmt->fetch();
     if($user && password_verify($password, $user['password'])){
         $_SESSION['user_id'] = $user['id'];
@@ -24,7 +30,7 @@ function loginUser($username, $password){
 function currentUser(){
     if(empty($_SESSION['user_id'])) return null;
     $pdo = getPDO();
-    $stmt = $pdo->prepare("SELECT id,username,role FROM users WHERE id = ? LIMIT 1");
+    $stmt = $pdo->prepare("SELECT id,username,email,role FROM users WHERE id = ? LIMIT 1");
     $stmt->execute([$_SESSION['user_id']]);
     return $stmt->fetch();
 }

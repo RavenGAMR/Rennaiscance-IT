@@ -2,17 +2,18 @@
 require_once __DIR__ . '/auth.php';
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $u = $_POST['username'] ?? '';
+    $e = $_POST['email'] ?? '';
     $p = $_POST['password'] ?? '';
-    if($u && $p){
-        if(registerUser($u,$p)){
+    if($u && $p && $e){
+        if(registerUser($u,$p,'user',$e)){
             loginUser($u,$p);
             header('Location: Index.php');
             exit;
         } else {
-            $error = 'Registration failed (username may exist)';
+            $error = 'Registration failed (username or email may exist)';
         }
     } else {
-        $error = 'Please fill both fields';
+        $error = 'Please fill all fields';
     }
 }
 ?>
@@ -70,6 +71,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                             <div class="mb-3">
                                 <label class="form-label">Username</label>
                                 <input name="username" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Password</label>

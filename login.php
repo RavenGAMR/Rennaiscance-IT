@@ -60,7 +60,7 @@
 <?php
 require_once __DIR__ . '/auth.php';
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
-    $u = $_POST['username'] ?? '';
+    $u = $_POST['username'] ?? $_POST['email'] ?? '';
     $p = $_POST['password'] ?? '';
     if(loginUser($u,$p)){
         $user = currentUser();

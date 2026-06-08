@@ -12,6 +12,7 @@ USE `rennaiscance_it`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `username` VARCHAR(100) NOT NULL UNIQUE,
+  `email` VARCHAR(255) DEFAULT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
   `role` VARCHAR(20) NOT NULL DEFAULT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -40,6 +41,8 @@ CREATE TABLE IF NOT EXISTS `articles` (
 
 -- Example: replace <hashed_password_here> with the produced hash string.
 -- INSERT INTO `users` (`username`,`password`,`role`) VALUES ('admin', '<hashed_password_here>', 'admin');
+-- If you have an email for the user include it as well (email is optional here):
+-- INSERT INTO `users` (`username`,`email`,`password`,`role`) VALUES ('admin','admin@example.com', '<hashed_password_here>', 'admin');
 
 -- Sample articles
 INSERT INTO `articles` (`title`,`slug`,`content`) VALUES
