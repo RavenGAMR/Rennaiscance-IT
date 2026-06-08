@@ -29,12 +29,8 @@
     </nav>
 
     <main class="container py-5">
-<<<<<<< Updated upstream
-    Heeft u een vraag over een product of dienst? Stel deze dan gerust. Bij ons kunt u gewoon op werkdagen tijdens kantooruren direct telefonisch terecht, of anders te allen tijde per email.
-=======
     <h4>Heeft u een vraag over een product of dienst? Stel deze dan gerust. Bij ons kunt u gewoon op werkdagen tijdens kantooruren direct telefonisch terecht, of anders te allen tijde per email.</h4>
     
->>>>>>> Stashed changes
     <div id="googleMap" style="width:100%;height:400px;"></div>
 
         <script>
