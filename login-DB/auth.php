@@ -38,15 +38,23 @@ function currentUser(){
 function requireLogin(){
     if(!currentUser()){
         $ret = $_SERVER['REQUEST_URI'] ?? '/';
-        header('Location: /login-DB/login.php?return=' . urlencode($ret));
+        $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '/');
+        $segments = array_filter(explode('/', trim($scriptDir, '/')));
+        $levels = max(0, count($segments) - 1);
+        $redirectBase = str_repeat('../', $levels);
+        header('Location: ' . $redirectBase . 'login-DB/login.php?return=' . urlencode($ret));
         exit;
     }
 }
 
 function requireAdmin(){
+    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '/');
+    $segments = array_filter(explode('/', trim($scriptDir, '/')));
+    $levels = max(0, count($segments) - 1);
+    $redirectBase = str_repeat('../', $levels);
     $u = currentUser();
     if(!$u || $u['role'] !== 'admin'){
-        header('Location: /Index.php');
+        header('Location: ' . $redirectBase . 'Index.php');
         exit;
     }
 }

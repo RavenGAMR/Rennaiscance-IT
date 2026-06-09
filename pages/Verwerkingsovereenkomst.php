@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rennaiscance IT</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
-    <link rel="stylesheet" href="/stylesheet/Style.css">
+  <link rel="stylesheet" href="Style.css">
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
 </head>
 <body class="verwerkingsovereenkomst-page">
-    <?php include __DIR__ . '/../components/navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
 
     <main class="container py-5">
         <div class="row">
@@ -34,12 +34,12 @@
                     Ons aangepaste Privacybeleid geeft een duidelijke beschrijving van onze gegevenspraktijken en de wijze waarop u uw gegevens kunt beheren.
                 </p>
                 <div class="downloads mt-3">
-                    <a class="btn" style="margin-left: 24px;" href="/pages/Privacypolicy.php">Lees ons Privacybeleid</a>
+                    <a class="btn" style="margin-left: 24px;" href="Privacypolicy.php">Lees ons Privacybeleid</a>
                 </div>
             </div>
         </div>
     </main>
 
-    <?php include __DIR__ . '/../components/footer.php'; ?>
+    <?php include 'footer.php'; ?>
 </body>
 </html>

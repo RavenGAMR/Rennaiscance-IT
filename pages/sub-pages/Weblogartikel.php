@@ -1,7 +1,7 @@
 <?php
 // Single template for weblogs. Use ?id=N to select article.
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-require_once __DIR__ . '/../../login-DB/db.php';
+require_once __DIR__ . '/db.php';
 $pdo = getPDO();
 $article = null;
 try {
@@ -14,11 +14,11 @@ try {
 }
 
 if(!$article){
-  header('Location: /pages/Weblog.php');
-  exit;
+    header('Location: Weblog.php');
+    exit;
 }
 
-require_once __DIR__ . '/../../login-DB/auth.php';
+require_once __DIR__ . '/auth.php';
 
 // markdown fallback
 $mdPath = __DIR__ . '/content/weblog/' . $id . '.md';
@@ -73,10 +73,10 @@ if (file_exists($mdPath) && empty(trim($article['content'] ?? ''))) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?php echo htmlspecialchars($article['title']); ?> - Rennaiscance IT</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/stylesheet/Style.css">
+  <link rel="stylesheet" href="Style.css">
 </head>
 <body>
-  <?php include __DIR__ . '/../../components/navbar.php'; ?>
+  <?php include 'navbar.php'; ?>
   <main class="container py-5">
     <article class="row">
       <div class="col-12">
@@ -96,14 +96,14 @@ if (file_exists($mdPath) && empty(trim($article['content'] ?? ''))) {
         ?>
         <?php if(function_exists('currentUser') && ($u = currentUser()) && $u['role'] === 'admin'): ?>
           <div class="mt-4">
-            <a href="/pages/Admin.php?weblog_action=edit&wid=<?php echo $article['id']; ?>" class="btn btn-sm btn-outline-primary">Bewerk artikel</a>
-              <a href="/pages/Admin.php" class="btn btn-sm btn-success">Nieuw artikel</a>
+            <a href="Admin.php?weblog_action=edit&wid=<?php echo $article['id']; ?>" class="btn btn-sm btn-outline-primary">Bewerk artikel</a>
+            <a href="Admin.php" class="btn btn-sm btn-success">Nieuw artikel</a>
           </div>
         <?php endif; ?>
       </div>
     </article>
-    <p class="mt-4"><a href="/pages/Weblog.php">&larr; Terug naar Weblog</a></p>
+    <p class="mt-4"><a href="Weblog.php">&larr; Terug naar Weblog</a></p>
   </main>
-  <?php include __DIR__ . '/../../components/footer.php'; ?>
+  <?php include 'footer.php'; ?>
 </body>
 </html>

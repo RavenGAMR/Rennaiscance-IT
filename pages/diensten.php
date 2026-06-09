@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../login-DB/auth.php';
+require_once __DIR__ . '/auth.php';
 $pdo = getPDO();
 $stmt = $pdo->query('SELECT id,title,slug,image,price FROM articles ORDER BY id ASC');
 $services = $stmt->fetchAll();
@@ -12,10 +12,10 @@ $user = currentUser();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Diensten - Rennaiscance IT</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" crossorigin="anonymous">
-    <link rel="stylesheet" href="/stylesheet/Style.css">
+  <link rel="stylesheet" href="Style.css">
 </head>
 <body>
-    <?php include __DIR__ . '/../components/navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
     <main class="container py-5">
         <h1 class="black-heading">Onze Diensten</h1>
         <div class="diensten-row g-4">
@@ -37,12 +37,12 @@ $user = currentUser();
                             ?>
                             <?php if($paid): ?>
                                 <span class="badge bg-success">Betaald</span>
-                                <a href="/pages/sub-pages/article.php?slug=<?php echo urlencode($s['slug']); ?>" class="btn btn-outline-primary btn-sm ms-2">Bekijk</a>
+                                <a href="article.php?slug=<?php echo urlencode($s['slug']); ?>" class="btn btn-outline-primary btn-sm ms-2">Bekijk</a>
                             <?php else: ?>
                                 <?php if($user): ?>
-                                    <a href="/pages/sub-pages/purchase.php?product=<?php echo urlencode($product); ?>&return=<?php echo urlencode('/pages/diensten.php'); ?>" class="btn btn-primary">Koop dienst</a>
+                                    <a href="purchase.php?product=<?php echo urlencode($product); ?>&return=<?php echo urlencode('diensten.php'); ?>" class="btn btn-primary">Koop dienst</a>
                                 <?php else: ?>
-                                    <a href="/login-DB/login.php" class="btn btn-primary">Log in om te kopen</a>
+                                    <a href="login.php" class="btn btn-primary">Log in om te kopen</a>
                                 <?php endif; ?>
                             <?php endif; ?>
                         </div>
@@ -52,6 +52,6 @@ $user = currentUser();
             <?php endforeach; ?>
         </div>
     </main>
-    <?php include __DIR__ . '/../components/footer.php'; ?>
+    <?php include 'footer.php'; ?>
 </body>
 </html>

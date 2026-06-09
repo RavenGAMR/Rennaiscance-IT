@@ -3,7 +3,7 @@
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 // Make current user available to show admin actions
 try {
-  require_once __DIR__ . '/../../login-DB/db.php';
+  require_once __DIR__ . '/db.php';
   $pdo = getPDO();
   $stmt = $pdo->prepare('SELECT id,title,content,image,category FROM helpdesk_articles WHERE id = ? LIMIT 1');
   $stmt->execute([$id]);
@@ -17,12 +17,12 @@ try {
 
 if(!$article){
   // No article found in DB — redirect back to listing
-  header('Location: /pages/Helpdesk.php');
+  header('Location: Helpdesk.php');
   exit;
 }
 
 // Make current user available to show admin actions
-require_once __DIR__ . '/../../login-DB/auth.php';
+require_once __DIR__ . '/auth.php';
 
 // If a markdown placeholder exists for this article, load it as content.
 $mdPath = __DIR__ . '/content/helpdesk/' . $id . '.md';
@@ -80,10 +80,10 @@ if (file_exists($mdPath) && empty(trim($article['content'] ?? ''))) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?php echo htmlspecialchars($article['title']); ?> - Rennaiscance IT</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/stylesheet/Style.css">
+  <link rel="stylesheet" href="Style.css">
 </head>
 <body>
-  <?php include __DIR__ . '/../../components/navbar.php'; ?>
+  <?php include 'navbar.php'; ?>
   <main class="container py-5">
     <article class="row">
       <div class="col-12">
@@ -104,14 +104,14 @@ if (file_exists($mdPath) && empty(trim($article['content'] ?? ''))) {
         ?>
         <?php if(function_exists('currentUser') && ($u = currentUser()) && $u['role'] === 'admin'): ?>
           <div class="mt-4">
-            <a href="/pages/Admin.php?helpdesk_action=edit&hid=<?php echo $article['id']; ?>" class="btn btn-sm btn-outline-primary">Bewerk artikel</a>
-            <a href="/pages/Admin.php" class="btn btn-sm btn-success">Nieuw artikel</a>
+            <a href="Admin.php?helpdesk_action=edit&hid=<?php echo $article['id']; ?>" class="btn btn-sm btn-outline-primary">Bewerk artikel</a>
+            <a href="Admin.php" class="btn btn-sm btn-success">Nieuw artikel</a>
           </div>
         <?php endif; ?>
       </div>
     </article>
-    <p class="mt-4"><a href="/pages/Helpdesk.php">&larr; Terug naar Helpdesk</a></p>
+    <p class="mt-4"><a href="Helpdesk.php">&larr; Terug naar Helpdesk</a></p>
   </main>
-  <?php include __DIR__ . '/../../components/footer.php'; ?>
+  <?php include 'footer.php'; ?>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../login-DB/auth.php';
+require_once __DIR__ . '/auth.php';
 $pdo = getPDO();
 
 // preserve an incoming product across a login redirect
@@ -75,10 +75,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Aankoop</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" crossorigin="anonymous">
-  <link rel="stylesheet" href="/stylesheet/Style.css">
+  <link rel="stylesheet" href="Style.css">
 </head>
 <body>
-  <?php include __DIR__ . '/../../components/navbar.php'; ?>
+  <?php include 'navbar.php'; ?>
   <main class="container py-5">
     <div class="row justify-content-center">
       <div class="col-md-6">
@@ -120,6 +120,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
       </div>
     </div>
   </main>
-  <?php include __DIR__ . '/../../components/footer.php'; ?>
+  <?php include 'footer.php'; ?>
 </body>
 </html>
