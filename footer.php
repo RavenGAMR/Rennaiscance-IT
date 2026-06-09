@@ -11,7 +11,7 @@
                 </ul>
             </div>
             <div class="footer-left">
-                <img src="Renaissance-wit.png" alt="Renaissance logo" class="footer-logo mb-3" />
+                <img src="Media/Logos/Renaissance-Wit.png" alt="Renaissance logo" class="footer-logo mb-3" />
                 <div class="footer-address text-start">
                     <p class="mb-1">Renaissance IT</p>
                     <p class="mb-1">Veraartlaan 4</p>
