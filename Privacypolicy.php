@@ -12,8 +12,9 @@
 <body>
     <?php include 'navbar.php'; ?>
 
-    <main class="container py-5">
+    <main class="container p-5">
       <h5>Renaissance IT, gevestigd aan de Veraartlaan 4, 2288 GM te Rijswijk, is verantwoordelijk voor de verwerking van persoonsgegevens zoals weergegeven in deze privacyverklaring.</h5>
+      <br>
       <h2 class="Renaissance-rood">Contactgegevens</h2>
       <h5>Website</h5>
       <p class="Renaissance-rood">https://www.renaissance.nl</p>
@@ -32,8 +33,8 @@
         Nederland
       </address>
 
-      <p><strong>Telefoon:</strong> +31 71 5724203<br>
-      <strong>E-mail adres:</strong> <a href="mailto:info@renaissance.nl">info@renaissance.nl</a></p>
+      <p><strong>Telefoon:</strong><br> +31 71 5724203<br>
+      <strong>E-mail adres:</strong><br> <a href="mailto:info@renaissance.nl">info@renaissance.nl</a></p>
 
       <h2 class="Renaissance-rood">Persoonsgegevens die wij verwerken</h2>
       <p>Renaissance IT verwerkt uw persoonsgegevens doordat u gebruik maakt van onze diensten en/of omdat u deze zelf aan ons verstrekt.</p>
@@ -48,7 +49,7 @@
       </ul>
 
       <h2 class="Renaissance-rood">Bijzondere en/of gevoelige persoonsgegevens die wij verwerken</h2>
-      <p>Onze website en/of dienst heeft niet de intentie gegevens te verzamelen over websitebezoekers die jonger zijn dan 16 jaar, tenzij ze toestemming hebben van ouders of voogd. We kunnen echter niet controleren of een bezoeker ouder dan 16 is. Wij raden ouders aan betrokken te zijn bij de online activiteiten van hun kinderen. Als u ervan overtuigd bent dat wij zonder toestemming persoonlijke gegevens hebben verzameld over een minderjarige, neem dan contact op via <a href="mailto:info@renaissance.nl">info@renaissance.nl</a>; wij verwijderen deze informatie.</p>
+      <p>Onze website en/of dienst heeft niet de intentie gegevens te verzamelen over websitebezoekers die jonger zijn dan 16 jaar, tenzij ze toestemming hebben van ouders of voogd. We kunnen echter niet controleren of een bezoeker ouder dan 16 is. Wij raden ouders aan betrokken te zijn bij de online activiteiten van hun kinderen. Als u ervan overtuigd bent dat wij zonder toestemming persoonlijke gegevens hebben verzameld over een minderjarige, neem dan contact op via <a href="mailto:info@renaissance.nl">info@renaissance.nl</a> wij verwijderen deze informatie.</p>
 
       <h2 class="Renaissance-rood">Met welk doel en op basis van welke grondslag wij persoonsgegevens verwerken</h2>
       <p>Renaissance IT verwerkt uw persoonsgegevens voor de volgende doelen:</p>
