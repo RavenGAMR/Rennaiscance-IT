@@ -10,9 +10,37 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
 </head>
 <body>
-    <?php include 'navbar.php'; ?>
+    <?php include 'navbar.php';
+    $pdo = getPDO();
+    $articles = [];
+    try {
+        $stmt = $pdo->query('SELECT id, title, slug, content FROM articles ORDER BY id DESC');
+        $articles = $stmt->fetchAll();
+    } catch (PDOException $e) {
+        $articles = [];
+    }
+    ?>
     <main class="container py-5">
-        
+      <h1 class="mb-4">Weblog Artikelen</h1>
+      <?php if (count($articles) === 0): ?>
+        <div class="alert alert-info">Er zijn nog geen artikelen beschikbaar.</div>
+      <?php else: ?>
+        <div class="row g-4">
+          <?php foreach ($articles as $article): ?>
+            <div class="col-12 col-md-6">
+              <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                  <h2 class="card-title h5 mb-3"><?php echo htmlspecialchars($article['title'], ENT_QUOTES, 'UTF-8'); ?></h2>
+                  <p class="text-muted mb-3"><strong>ID:</strong> <?php echo (int) $article['id']; ?> <strong>Slug:</strong> <?php echo htmlspecialchars($article['slug'], ENT_QUOTES, 'UTF-8'); ?></p>
+                  <div class="card-text mb-3">
+                    <?php echo nl2br(htmlspecialchars($article['content'], ENT_QUOTES, 'UTF-8')); ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </main>
     <?php include 'footer.php'; ?>
 </body>
