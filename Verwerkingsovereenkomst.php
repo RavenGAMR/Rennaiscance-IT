@@ -40,16 +40,6 @@
         </div>
     </main>
 
-    <footer class="page-footer text-center text-white py-4">
-        <div class="container">
-            <p class="mb-3"></p>
-            <ul class="footer-links mb-0">
-                <li><a href="Weblog.php">Weblog</a></li>
-                <li><a href="Verwerkingsovereenkomst.php">Verwerkingsovereenkomst</a></li>
-                <li><a href="Privacypolicy.php">Privacypolicy</a></li>
-                <li><a href="Contact.php">Contact</a></li>
-            </ul>
-        </div>
-    </footer>
+    <?php include 'footer.php'; ?>
 </body>
 </html>
