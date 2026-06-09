@@ -11,9 +11,22 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $title = trim($_POST['title'] ?? '');
         $slug = trim($_POST['slug'] ?? '');
         $content = trim($_POST['content'] ?? '');
+        $price = floatval(str_replace(',', '.', $_POST['price'] ?? 0));
         if($title && $slug){
-            $stmt = $pdo->prepare('INSERT INTO articles (title, slug, content) VALUES (?, ?, ?)');
-            $stmt->execute([$title, $slug, $content]);
+            $stmt = $pdo->prepare('INSERT INTO articles (title, slug, content, price) VALUES (?, ?, ?, ?)');
+            $stmt->execute([$title, $slug, $content, $price]);
+            $articleId = $pdo->lastInsertId();
+            // handle uploaded image for article
+            if(!empty($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK){
+                $f = $_FILES['image'];
+                $ext = pathinfo($f['name'], PATHINFO_EXTENSION);
+                $name = time() . '_' . bin2hex(random_bytes(6)) . ($ext ? '.' . $ext : '');
+                $dest = __DIR__ . '/uploads/articles/' . $name;
+                if(move_uploaded_file($f['tmp_name'], $dest)){
+                    $u = $pdo->prepare('UPDATE articles SET image = ? WHERE id = ?');
+                    $u->execute([$name, $articleId]);
+                }
+            }
             header('Location: Admin.php?msg=created');
             exit;
         }
@@ -23,9 +36,21 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $title = trim($_POST['title'] ?? '');
         $slug = trim($_POST['slug'] ?? '');
         $content = trim($_POST['content'] ?? '');
+        $price = floatval(str_replace(',', '.', $_POST['price'] ?? 0));
         if($id && $title && $slug){
-            $stmt = $pdo->prepare('UPDATE articles SET title = ?, slug = ?, content = ? WHERE id = ?');
-            $stmt->execute([$title, $slug, $content, $id]);
+            $stmt = $pdo->prepare('UPDATE articles SET title = ?, slug = ?, content = ?, price = ? WHERE id = ?');
+            $stmt->execute([$title, $slug, $content, $price, $id]);
+            // handle uploaded image for article (replace)
+            if(!empty($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK){
+                $f = $_FILES['image'];
+                $ext = pathinfo($f['name'], PATHINFO_EXTENSION);
+                $name = time() . '_' . bin2hex(random_bytes(6)) . ($ext ? '.' . $ext : '');
+                $dest = __DIR__ . '/uploads/articles/' . $name;
+                if(move_uploaded_file($f['tmp_name'], $dest)){
+                    $u = $pdo->prepare('UPDATE articles SET image = ? WHERE id = ?');
+                    $u->execute([$name, $id]);
+                }
+            }
             header('Location: Admin.php?msg=updated');
             exit;
         }
@@ -56,6 +81,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $ustmt->execute([$newRole, $uid]);
         header('Location: Admin.php?msg=rolechanged'); exit;
     }
+    
 }
 // Helpers for edit/create views
 $editing = false;
@@ -63,14 +89,14 @@ $editArticle = null;
 $action = $_GET['action'] ?? '';
 if($action === 'edit' && !empty($_GET['id'])){
     $id = intval($_GET['id']);
-    $stmt = $pdo->prepare('SELECT id,title,slug,content FROM articles WHERE id = ? LIMIT 1');
+    $stmt = $pdo->prepare('SELECT id,title,slug,content,price FROM articles WHERE id = ? LIMIT 1');
     $stmt->execute([$id]);
     $editArticle = $stmt->fetch();
     if($editArticle){ $editing = true; }
 }
 
 // Fetch all diensten for listing
-$stmt = $pdo->query('SELECT id,title,slug FROM articles ORDER BY id DESC');
+$stmt = $pdo->query('SELECT id,title,slug,price FROM articles ORDER BY id DESC');
 $articles = $stmt->fetchAll();
 
 // Fetch users for role management
@@ -122,6 +148,7 @@ $current = currentUser();
                                 <tr>
                                     <th>ID</th>
                                     <th>Titel</th>
+                                    <th>Prijs</th>
                                     <th>Slug</th>
                                     <th>Acties</th>
                                 </tr>
@@ -131,6 +158,7 @@ $current = currentUser();
                                     <tr>
                                         <td><?php echo htmlspecialchars($a['id']); ?></td>
                                         <td><?php echo htmlspecialchars($a['title']); ?></td>
+                                        <td>&euro; <?php echo number_format($a['price'] ?? 0,2,',','.'); ?></td>
                                         <td><?php echo htmlspecialchars($a['slug']); ?></td>
                                         <td>
                                             <a href="Admin.php?action=edit&id=<?php echo $a['id']; ?>" class="btn btn-sm btn-outline-primary">Bewerk</a>
@@ -151,8 +179,8 @@ $current = currentUser();
                 <div class="card">
                     <div class="card-body">
                         <?php if($editing && $editArticle): ?>
-                            <h2 class="h5">Bewerk dienst</h2>
-                            <form method="post">
+                            <h2 class="h5 black-heading">Bewerk dienst</h2>
+                            <form method="post" enctype="multipart/form-data">
                                 <input type="hidden" name="action" value="update">
                                 <input type="hidden" name="id" value="<?php echo htmlspecialchars($editArticle['id']); ?>">
                                 <div class="mb-3">
@@ -167,14 +195,22 @@ $current = currentUser();
                                     <label class="form-label">Content</label>
                                     <textarea name="content" class="form-control" rows="6"><?php echo htmlspecialchars($editArticle['content']); ?></textarea>
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Prijs (EUR)</label>
+                                    <input name="price" class="form-control" required value="<?php echo htmlspecialchars(number_format($editArticle['price'] ?? 0, 2, ',', '.')); ?>">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Afbeelding (optioneel)</label>
+                                    <input type="file" name="image" accept="image/*" class="form-control">
+                                </div>
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-primary" type="submit">Opslaan</button>
                                     <a href="Admin.php" class="btn btn-secondary">Annuleer</a>
                                 </div>
                             </form>
                         <?php else: ?>
-                            <h2 class="h5">Nieuwe dienst toevoegen</h2>
-                            <form method="post">
+                            <h2 class="h5 black-heading">Nieuwe dienst toevoegen</h2>
+                            <form method="post" enctype="multipart/form-data">
                                 <input type="hidden" name="action" value="create">
                                 <div class="mb-3">
                                     <label class="form-label">Titel</label>
@@ -187,6 +223,14 @@ $current = currentUser();
                                 <div class="mb-3">
                                     <label class="form-label">Content</label>
                                     <textarea name="content" class="form-control" rows="6"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Prijs (EUR)</label>
+                                    <input name="price" class="form-control" required value="0,00">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Afbeelding (optioneel)</label>
+                                    <input type="file" name="image" accept="image/*" class="form-control">
                                 </div>
                                 <div class="d-grid">
                                     <button class="btn btn-success" type="submit">Maak dienst</button>

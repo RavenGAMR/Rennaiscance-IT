@@ -500,18 +500,99 @@ main {
 
 .article-card {
     min-height: 320px;
-    border-radius: 16px;
-    overflow: hidden;
+    border-radius: 12px;
+    overflow: visible;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+
+/* Layout: image left, text right (responsive) */
+
+.article-card>.d-flex {
+    gap: 18px;
+    align-items: center;
+}
+
+.article-card .article-card-image {
+    width: 220px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 14px;
+    flex: 0 0 220px;
+}
+
+@media (min-width: 992px) {
+    .article-card .article-card-image {
+        width: 240px;
+        height: 150px;
+        flex: 0 0 240px;
+        border-radius: 14px;
+    }
+}
+
+@media (max-width: 576px) {
+    .article-card>.d-flex {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .article-card .article-card-image {
+        width: 100%;
+        height: 220px;
+        flex: none;
+        border-radius: 12px;
+    }
+    .article-card .me-3 {
+        margin-bottom: 12px;
+    }
 }
 
 .article-card-image {
-    min-height: 180px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     background-color: #e9ecef;
     border-bottom: 1px solid #dee2e6;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Smaller hero image for single article view */
+.article-hero-image {
+    width: 320px;
+    aspect-ratio: 1 / 1;
+    background-color: #e9ecef;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    margin: 0 auto 16px;
+}
+
+
+/* Use img elements for thumbnails: keep them responsive and nicely rounded */
+
+.article-card-image {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 0;
+    overflow: hidden;
+    background-color: transparent;
+    border-bottom: none;
+}
+
+@media(min-width: 992px) {
+    .article-card-image {
+        height: 200px;
+    }
 }
 
 .article-card .card-body {
-    padding: 24px;
+    padding: 16px 0 16px 24px;
+    background: transparent;
 }
 
 .article-card .card-title {
@@ -529,6 +610,15 @@ h3 {
 }
 
 h3 {
+    color: #000000 !important;
+}
+
+
+/* Helpdesk page: force black headings only on Helpdesk.php */
+
+.helpdesk-page h1,
+.helpdesk-page h2,
+.helpdesk-page h3 {
     color: #000000 !important;
 }
 
@@ -572,6 +662,34 @@ h3 {
         width: 100%;
         padding: 14px 18px;
         margin: 0;
+    }
+}
+
+/* Scoped services layout: enforce 3 columns per row for `.diensten-row` */
+.diensten-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: flex-start;
+    margin-top: 16px;
+}
+.diensten-row > .col-md-4 {
+    flex: 0 0 calc((100% - 48px) / 3);
+    max-width: calc((100% - 48px) / 3);
+    box-sizing: border-box;
+}
+
+@media (max-width: 992px) {
+    .diensten-row > .col-md-4 {
+        flex: 0 0 calc((100% - 24px) / 2);
+        max-width: calc((100% - 24px) / 2);
+    }
+}
+
+@media (max-width: 576px) {
+    .diensten-row > .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
     }
 }
 .Renaissance-rood {
