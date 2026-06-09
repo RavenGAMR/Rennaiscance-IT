@@ -12,7 +12,7 @@
                 <div class="navbar-nav ms-auto">
                     <?php $u = currentUser(); ?>
                     <a class="nav-link" href="Index.php">Home</a>
-                    <a class="nav-link" href="Weblog.php">Weblog</a>
+                    <a class="nav-link" href="diensten.php">Diensten</a>
                     <a class="nav-link" href="Helpdesk.php">Helpdesk</a>
                     <a class="nav-link" href="Contact.php">Contact</a>
                     <?php if($u): ?>

@@ -37,7 +37,8 @@ function currentUser(){
 
 function requireLogin(){
     if(!currentUser()){
-        header('Location: login.php');
+        $ret = $_SERVER['REQUEST_URI'] ?? '/';
+        header('Location: login.php?return=' . urlencode($ret));
         exit;
     }
 }
