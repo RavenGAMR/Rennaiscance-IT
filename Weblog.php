@@ -30,11 +30,10 @@
             <div class="col-12 col-md-6">
               <div class="card shadow-sm h-100">
                 <div class="card-body d-flex flex-column">
-                  <h2 class="card-title h5 mb-3"><?php echo htmlspecialchars($article['title'], ENT_QUOTES, 'UTF-8'); ?></h2>
-                  <p class="text-muted mb-3"><strong>ID:</strong> <?php echo (int) $article['id']; ?> <strong>Slug:</strong> <?php echo htmlspecialchars($article['slug'], ENT_QUOTES, 'UTF-8'); ?></p>
-                  <div class="card-text mb-3">
-                    <?php echo nl2br(htmlspecialchars($article['content'], ENT_QUOTES, 'UTF-8')); ?>
-                  </div>
+                  <a href="WeblogArticle.php?id=<?php echo (int) $article['id']; ?>" class="stretched-link" style="text-decoration: none;">
+                    <h2 class="card-title h5 mb-2"><?php echo htmlspecialchars($article['title'], ENT_QUOTES, 'UTF-8'); ?></h2>
+                  </a>
+                  <p class="text-muted mb-0"><strong>Slug:</strong> <?php echo htmlspecialchars($article['slug'], ENT_QUOTES, 'UTF-8'); ?></p>
                 </div>
               </div>
             </div>
