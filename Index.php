@@ -77,7 +77,7 @@ Als gespecialiseerd bedrijf in WordPress-ontwikkeling, hebben we uitgebreide erv
                 <div class="col-12 col-lg-5">
                     <div class="feature-panel">
                         <img src="Media/Algemeen/Laralogo.png" alt="Laravel logo" class="feature-logo" />
-                    </div>
+                    </div>  
                 </div>
             </div>
         </div>
