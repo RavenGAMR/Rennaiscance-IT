@@ -24,7 +24,7 @@ $user = currentUser();
                 <div class="card h-100 shadow-sm">
                     <?php $img = $s['image'] ?? null; ?>
                     <?php if(!empty($img)): ?>
-                        <div class="article-card-image" style="background-image:url('uploads/articles/<?php echo htmlspecialchars($img); ?>'); background-size:cover; background-position:center; min-height:180px;"></div>
+                        <div class="article-card-image" style="background-image:url('uploads/articles/<?php echo htmlspecialchars($img); ?>');"></div>
                     <?php endif; ?>
                     <div class="card-body d-flex flex-column">
                         <h2 class="black-heading"><?php echo htmlspecialchars($s['title']); ?></h2>

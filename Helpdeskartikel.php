@@ -1,44 +1,28 @@
 <?php
 // Single template for helpdesk articles. Use ?id=N to select article.
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-$articles = [
-  1 => [
-    'title' => 'Hoe activeer ik in Horde webmail de prullenmand functie?',
-    'image' => 'Media/Algemeen/thund.png',
-    'content' => '<p>Deze handleiding laat zien hoe je de prullenmandfunctie in Horde webmail activeert, zodat verwijderde berichten niet direct verdwijnen en je eenvoudig berichten kunt terughalen.</p>'
-  ],
-  2 => [
-    'title' => 'FTP verbinding instellen met Cyberduck',
-    'image' => 'Media/Algemeen/mail.png',
-    'content' => '<p>Cyberduck is een gebruiksvriendelijke FTP-client waarmee je verbinding maakt met een server en bestanden eenvoudig beheert. We leggen uit hoe je een FTP-verbinding instelt en opslaat voor toekomstig gebruik.</p>'
-  ],
-  3 => [
-    'title' => 'E-mail adres instellen Mozilla Thunderbird',
-    'image' => 'Media/Algemeen/mail2.webp',
-    'content' => '<p>We beschrijven stap voor stap hoe je je e-mailaccount instelt in Mozilla Thunderbird, inclusief de juiste serverinstellingen voor verzenden en ontvangen.</p>'
-  ],
-  4 => [
-    'title' => 'Webmail handleiding (placeholder)',
-    'image' => 'Media/Algemeen/webmail.png',
-    'content' => '<p>Dit is een tijdelijke placeholder voor artikel 4. Vervang dit met echte inhoud wanneer beschikbaar.</p>'
-  ],
-  5 => [
-    'title' => 'FTP: bestandsbeheer en instellingen (placeholder)',
-    'image' => 'Media/Algemeen/eend.webp',
-    'content' => '<p>Dit is een tijdelijke placeholder voor artikel 5. Vervang dit met echte inhoud wanneer beschikbaar.</p>'
-  ],
-  6 => [
-    'title' => 'Placeholder Artikel 6',
-    'image' => 'Media/Algemeen/thund.png',
-    'content' => '<p>Dit is een tijdelijke placeholder voor artikel 6. Vervang dit met echte inhoud wanneer beschikbaar.</p>'
-  ]
-];
+// Make current user available to show admin actions
+try {
+  require_once __DIR__ . '/db.php';
+  $pdo = getPDO();
+  $stmt = $pdo->prepare('SELECT id,title,content,image,category FROM helpdesk_articles WHERE id = ? LIMIT 1');
+  $stmt->execute([$id]);
+  $row = $stmt->fetch();
+  if($row){
+    $article = $row;
+  }
+} catch (Exception $e) {
+  $article = null;
+}
 
-if (!isset($articles[$id])) {
+if(!$article){
+  // No article found in DB — redirect back to listing
   header('Location: Helpdesk.php');
   exit;
 }
-$article = $articles[$id];
+
+// Make current user available to show admin actions
+require_once __DIR__ . '/auth.php';
 
 // If a markdown placeholder exists for this article, load it as content.
 $mdPath = __DIR__ . '/content/helpdesk/' . $id . '.md';
@@ -83,7 +67,8 @@ function render_markdown($md) {
   return $html;
 }
 
-if (file_exists($mdPath)) {
+// Only use markdown fallback when the DB content is empty
+if (file_exists($mdPath) && empty(trim($article['content'] ?? ''))) {
   $md = file_get_contents($mdPath);
   $article['content'] = '<div class="article-content">' . render_markdown($md) . '</div>';
 }
@@ -105,10 +90,24 @@ if (file_exists($mdPath)) {
         <h1><?php echo htmlspecialchars($article['title']); ?></h1>
       </div>
       <div class="col-12 col-md-5 col-lg-4 mb-4">
-        <img src="<?php echo $article['image']; ?>" alt="" class="img-fluid rounded-3" />
+        <?php $img = htmlspecialchars($article['image'] ?? ''); ?>
+        <?php if($img): ?>
+          <img src="<?php echo $img; ?>" alt="" class="img-fluid rounded-3" />
+        <?php endif; ?>
       </div>
       <div class="col-12 col-md-7 col-lg-8">
-        <?php echo $article['content']; ?>
+        <?php
+          // Remove any <img> tags from content so the page shows only the main article image above
+          $content = $article['content'] ?? '';
+          $content_without_imgs = preg_replace('/<img[^>]*>/i', '', $content);
+          echo $content_without_imgs;
+        ?>
+        <?php if(function_exists('currentUser') && ($u = currentUser()) && $u['role'] === 'admin'): ?>
+          <div class="mt-4">
+            <a href="Admin.php?helpdesk_action=edit&hid=<?php echo $article['id']; ?>" class="btn btn-sm btn-outline-primary">Bewerk artikel</a>
+            <a href="Admin.php" class="btn btn-sm btn-success">Nieuw artikel</a>
+          </div>
+        <?php endif; ?>
       </div>
     </article>
     <p class="mt-4"><a href="Helpdesk.php">&larr; Terug naar Helpdesk</a></p>

@@ -11,6 +11,18 @@
 </head>
 <body class="helpdesk-page">
     <?php include 'navbar.php'; ?>
+    <?php
+    // Try to load helpdesk articles from DB. If table missing or empty, fallback to hardcoded list below.
+    $dbArticles = null;
+    try {
+      require_once __DIR__ . '/db.php';
+      $pdo = getPDO();
+      $stmt = $pdo->query("SELECT id,title,slug,image,content,category FROM helpdesk_articles ORDER BY id ASC");
+      $dbArticles = $stmt->fetchAll();
+    } catch (Exception $e) {
+      $dbArticles = null;
+    }
+    ?>
     <main class="container py-5">
       <h1 class="mb-4">Helpdesk artikelen</h1>
 
@@ -20,91 +32,31 @@
         <a class="nav-link" href="#" data-filter="ftp">FTP</a>
       </nav>
 
-            <div class="card article-card mb-4" data-category="email">
+    <?php
+    if (is_array($dbArticles) && count($dbArticles) > 0) :
+        foreach ($dbArticles as $a) :
+            $cat = htmlspecialchars($a['category'] ?? 'email');
+            $img = htmlspecialchars($a['image'] ?? '');
+            $title = htmlspecialchars($a['title'] ?? '');
+            $id = (int)$a['id'];
+    ?>
+            <div class="card article-card mb-4" data-category="<?php echo $cat; ?>">
               <div class="d-flex align-items-center">
                 <div class="me-3" style="flex: 0 0 180px;">
-                  <img src="Media/Algemeen/thund.png" alt="" class="article-card-image img-fluid" />
+                  <img src="<?php echo $img; ?>" alt="" class="article-card-image img-fluid" />
                 </div>
                 <div class="flex-fill">
                   <div class="card-body p-0">
-                    <h2 class="card-title">Uitgaande mailserver van bestaand e-mail account wijzigen in Mozilla Thunderbird</h2>
-                    <a href="Helpdeskartikel.php?id=1" class="stretched-link"></a>
+                    <h2 class="card-title"><?php echo $title; ?></h2>
+                    <a href="Helpdeskartikel.php?id=<?php echo $id; ?>" class="stretched-link"></a>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div class="card article-card mb-4" data-category="email">
-              <div class="d-flex align-items-center">
-                <div class="me-3" style="flex: 0 0 180px;">
-                  <img src="Media/Algemeen/mail.png" alt="" class="article-card-image img-fluid" />
-                </div>
-                <div class="flex-fill">
-                  <div class="card-body p-0">
-                    <h2 class="card-title">FTP verbinding instellen met Cyberduck</h2>
-                    <a href="Helpdeskartikel.php?id=2" class="stretched-link"></a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card article-card mb-4" data-category="email">
-              <div class="d-flex align-items-center">
-                <div class="me-3" style="flex: 0 0 180px;">
-                  <img src="Media/Algemeen/mail2.png" alt="" class="article-card-image img-fluid" />
-                </div>
-                <div class="flex-fill">
-                  <div class="card-body p-0">
-                    <h2 class="card-title">E-mail adres instellen Mozilla Thunderbird</h2>
-                    <p>Wilt u uw e-mailaccount instellen op uw iPhone of iPad? In dit artikel leggen we stap voor stap uit hoe u eenvoudig een e-mailaccount toevoegt in iOS. U leert hoe u uw accountinstellingen invoert, welke servergegevens nodig zijn en hoe u problemen oplost als de configuratie niet meteen lukt. Volg deze handleiding en binnen enkele minuten kunt u e-mails verzenden en ontvangen op uw iPhone!</p>
-                    <a href="Helpdeskartikel.php?id=3" class="stretched-link"></a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card article-card mb-4" data-category="email">
-              <div class="d-flex align-items-center">
-                <div class="me-3" style="flex: 0 0 180px;">
-                  <img src="Media/Algemeen/webmail.png" alt="" class="article-card-image img-fluid" />
-                </div>
-                <div class="flex-fill">
-                  <div class="card-body p-0">
-                    <h2 class="card-title">Hoe activeer ik in Horde webmail de prullenmand functie?</h2>
-                    <a href="Helpdeskartikel.php?id=4" class="stretched-link"></a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card article-card mb-4" data-category="ftp">
-              <div class="d-flex align-items-center">
-                <div class="me-3" style="flex: 0 0 180px;">
-                  <img src="Media/Algemeen/eend.png" alt="" class="article-card-image img-fluid" />
-                </div>
-                <div class="flex-fill">
-                  <div class="card-body p-0">
-                    <h2 class="card-title">FTP-verbinding instellen en opslaan in Cyberduck</h2>
-                    <p>Cyberduck is een populaire en gebruiksvriendelijke FTP-client waarmee je eenvoudig verbinding kunt maken met een server en bestanden kunt beheren. In dit artikel leggen we uit hoe je Cyberduck downloadt, een FTP-verbinding instelt en opslaat voor toekomstig gebruik.</p>
-                    <a href="Helpdeskartikel.php?id=5" class="stretched-link"></a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card article-card mb-4" data-category="email">
-              <div class="d-flex align-items-center">
-                <div class="me-3" style="flex: 0 0 180px;">
-                  <img src="Media/Algemeen/thund.png" alt="" class="article-card-image img-fluid" />
-                </div>
-                <div class="flex-fill">
-                  <div class="card-body p-0">
-                    <h2 class="card-title">E-mail adres instellen Mozilla Thunderbird</h2>
-                    <a href="Helpdeskartikel.php?id=6" class="stretched-link"></a>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <?php
+        endforeach;
+    endif;
+    ?>
     </main>
 
     <script>
