@@ -132,6 +132,64 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             header('Location: Admin.php?msg=help_deleted'); exit;
         }
     }
+    // Weblogs CRUD
+    if($action === 'create_weblog'){
+        $title = trim($_POST['title'] ?? '');
+        $slug = trim($_POST['slug'] ?? '');
+        $content = trim($_POST['content'] ?? '');
+        $category = trim($_POST['category'] ?? 'general');
+        if($title){
+            $stmt = $pdo->prepare('INSERT INTO weblogs (title, slug, content, category) VALUES (?, ?, ?, ?)');
+            $stmt->execute([$title, $slug, $content, $category]);
+            $wid = $pdo->lastInsertId();
+            if(!empty($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK){
+                $f = $_FILES['image'];
+                $ext = pathinfo($f['name'], PATHINFO_EXTENSION);
+                $name = time() . '_' . bin2hex(random_bytes(6)) . ($ext ? '.' . $ext : '');
+                $rel = 'uploads/weblogs/' . $name;
+                $dest = __DIR__ . '/' . $rel;
+                if(move_uploaded_file($f['tmp_name'], $dest)){
+                    $u = $pdo->prepare('UPDATE weblogs SET image = ? WHERE id = ?');
+                    $u->execute([$rel, $wid]);
+                }
+            }
+            if($isAjax) ajaxResponse('ok','weblog_created');
+            header('Location: Admin.php?msg=weblog_created'); exit;
+        }
+    }
+    if($action === 'update_weblog'){
+        $id = intval($_POST['id'] ?? 0);
+        $title = trim($_POST['title'] ?? '');
+        $slug = trim($_POST['slug'] ?? '');
+        $content = trim($_POST['content'] ?? '');
+        $category = trim($_POST['category'] ?? 'general');
+        if($id && $title){
+            $stmt = $pdo->prepare('UPDATE weblogs SET title = ?, slug = ?, content = ?, category = ? WHERE id = ?');
+            $stmt->execute([$title, $slug, $content, $category, $id]);
+            if(!empty($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK){
+                $f = $_FILES['image'];
+                $ext = pathinfo($f['name'], PATHINFO_EXTENSION);
+                $name = time() . '_' . bin2hex(random_bytes(6)) . ($ext ? '.' . $ext : '');
+                $rel = 'uploads/weblogs/' . $name;
+                $dest = __DIR__ . '/' . $rel;
+                if(move_uploaded_file($f['tmp_name'], $dest)){
+                    $u = $pdo->prepare('UPDATE weblogs SET image = ? WHERE id = ?');
+                    $u->execute([$rel, $id]);
+                }
+            }
+            if($isAjax) ajaxResponse('ok','weblog_updated');
+            header('Location: Admin.php?msg=weblog_updated'); exit;
+        }
+    }
+    if($action === 'delete_weblog'){
+        $id = intval($_POST['id'] ?? 0);
+        if($id){
+            $stmt = $pdo->prepare('DELETE FROM weblogs WHERE id = ?');
+            $stmt->execute([$id]);
+            if($isAjax) ajaxResponse('ok','weblog_deleted');
+            header('Location: Admin.php?msg=weblog_deleted'); exit;
+        }
+    }
     if($action === 'changerole'){
         $uid = intval($_POST['user_id'] ?? 0);
         $newRole = $_POST['role'] ?? 'user';
@@ -260,6 +318,57 @@ if(isset($_GET['helpdesk_action']) && $_GET['helpdesk_action'] === 'edit' && !em
     exit;
 }
 
+// Weblog editing
+$editingWeblog = false;
+$editWeblog = null;
+$wAction = $_GET['weblog_action'] ?? '';
+if($wAction === 'edit' && !empty($_GET['wid'])){
+    $wid = intval($_GET['wid']);
+    $wst = $pdo->prepare('SELECT id,title,slug,content,image,category FROM weblogs WHERE id = ? LIMIT 1');
+    $wst->execute([$wid]);
+    $editWeblog = $wst->fetch();
+    if($editWeblog){ $editingWeblog = true; }
+}
+
+// If requested via AJAX, return only the edit form HTML for the weblog
+if(isset($_GET['weblog_action']) && $_GET['weblog_action'] === 'edit' && !empty($_GET['wid']) && isset($_GET['ajax'])){
+    $wid = intval($_GET['wid']);
+    $wst = $pdo->prepare('SELECT id,title,slug,content,image,category FROM weblogs WHERE id = ? LIMIT 1');
+    $wst->execute([$wid]);
+    $row = $wst->fetch();
+    if(!$row){ http_response_code(404); echo 'Weblog niet gevonden.'; exit; }
+    ?>
+    <form method="post" action="Admin.php" enctype="multipart/form-data" data-ajax="true">
+        <input type="hidden" name="action" value="update_weblog">
+        <input type="hidden" name="id" value="<?php echo htmlspecialchars($row['id']); ?>">
+        <div class="mb-2">
+            <label class="form-label">Titel</label>
+            <input name="title" class="form-control" required value="<?php echo htmlspecialchars($row['title']); ?>">
+        </div>
+        <div class="mb-2">
+            <label class="form-label">Slug</label>
+            <input name="slug" class="form-control" value="<?php echo htmlspecialchars($row['slug'] ?? ''); ?>">
+        </div>
+        <div class="mb-2">
+            <label class="form-label">Categorie</label>
+            <input name="category" class="form-control" value="<?php echo htmlspecialchars($row['category'] ?? 'general'); ?>">
+        </div>
+        <div class="mb-2">
+            <label class="form-label">Content</label>
+            <textarea name="content" class="form-control" rows="6"><?php echo htmlspecialchars($row['content'] ?? ''); ?></textarea>
+        </div>
+        <div class="mb-2">
+            <label class="form-label">Afbeelding (optioneel)</label>
+            <input type="file" name="image" accept="image/*" class="form-control">
+        </div>
+        <div class="d-grid gap-2">
+            <button class="btn btn-primary" type="submit">Opslaan</button>
+        </div>
+    </form>
+    <?php
+    exit;
+}
+
 // Fetch all diensten for listing
 $stmt = $pdo->query('SELECT id,title,slug,price FROM articles ORDER BY id DESC');
 $articles = $stmt->fetchAll();
@@ -270,6 +379,14 @@ try {
     $helpdeskArticles = $hstmt->fetchAll();
 } catch (Exception $e) {
     $helpdeskArticles = [];
+}
+
+// Fetch weblogs for listing
+try{
+    $wstmt = $pdo->query('SELECT id,title,slug,category FROM weblogs ORDER BY id DESC');
+    $weblogs = $wstmt->fetchAll();
+}catch(Exception $e){
+    $weblogs = [];
 }
 
 // Fetch users for role management
@@ -578,6 +695,79 @@ $current = currentUser();
         </div>
     </div>
 
+    <!-- Weblogs beheer -->
+    <div class="container py-4">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="h5">Weblogs</h2>
+                <div class="row">
+                    <div class="col-md-8">
+                        <table class="table table-sm mt-3">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Titel</th>
+                                    <th>Categorie</th>
+                                    <th>Acties</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach($weblogs as $w): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($w['id']); ?></td>
+                                    <td><?php echo htmlspecialchars($w['title']); ?></td>
+                                    <td><?php echo htmlspecialchars($w['category']); ?></td>
+                                    <td>
+                                        <a href="#" data-wid="<?php echo $w['id']; ?>" class="btn btn-sm btn-outline-primary open-weblog-edit">Bewerk</a>
+                                        <form method="post" style="display:inline" onsubmit="return confirm('Weet je het zeker dat je dit weblog wilt verwijderen?');">
+                                            <input type="hidden" name="action" value="delete_weblog">
+                                            <input type="hidden" name="id" value="<?php echo $w['id']; ?>">
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">Verwijder</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="h6">Nieuw weblog</h3>
+                                <form method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="action" value="create_weblog">
+                                    <div class="mb-2">
+                                        <label class="form-label">Titel</label>
+                                        <input name="title" class="form-control" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Slug</label>
+                                        <input name="slug" class="form-control" placeholder="bijv. mijn-blogpost">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Categorie</label>
+                                        <input name="category" class="form-control" value="general">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Content</label>
+                                        <textarea name="content" class="form-control" rows="6"></textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Afbeelding (optioneel)</label>
+                                        <input type="file" name="image" accept="image/*" class="form-control">
+                                    </div>
+                                    <div class="d-grid">
+                                        <button class="btn btn-success" type="submit">Maak weblog</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
             <!-- AJAX result modal -->
             <div class="modal fade" id="ajaxModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-sm modal-dialog-centered">
@@ -630,6 +820,7 @@ $current = currentUser();
                 document.addEventListener('click', function(e){
                     const tHelp = e.target.closest('.open-helpdesk-edit');
                     const tArt = e.target.closest('.open-article-edit');
+                    const tWeb = e.target.closest('.open-weblog-edit');
                     let url = null;
                     if(tHelp){
                         e.preventDefault();
@@ -641,6 +832,11 @@ $current = currentUser();
                         const id = tArt.getAttribute('data-id');
                         if(!id) return;
                         url = 'Admin.php?action=edit&id=' + encodeURIComponent(id) + '&ajax=1';
+                    } else if(tWeb){
+                        e.preventDefault();
+                        const wid = tWeb.getAttribute('data-wid');
+                        if(!wid) return;
+                        url = 'Admin.php?weblog_action=edit&wid=' + encodeURIComponent(wid) + '&ajax=1';
                     } else {
                         return;
                     }

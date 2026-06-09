@@ -1,32 +1,27 @@
 <?php
-// Single template for helpdesk articles. Use ?id=N to select article.
+// Single template for weblogs. Use ?id=N to select article.
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-// Make current user available to show admin actions
+require_once __DIR__ . '/db.php';
+$pdo = getPDO();
+$article = null;
 try {
-  require_once __DIR__ . '/db.php';
-  $pdo = getPDO();
-  $stmt = $pdo->prepare('SELECT id,title,content,image,category FROM helpdesk_articles WHERE id = ? LIMIT 1');
-  $stmt->execute([$id]);
-  $row = $stmt->fetch();
-  if($row){
-    $article = $row;
-  }
+    $stmt = $pdo->prepare('SELECT id,title,content,image,category FROM weblogs WHERE id = ? LIMIT 1');
+    $stmt->execute([$id]);
+    $row = $stmt->fetch();
+    if($row) $article = $row;
 } catch (Exception $e) {
-  $article = null;
+    $article = null;
 }
 
 if(!$article){
-  // No article found in DB — redirect back to listing
-  header('Location: Helpdesk.php');
-  exit;
+    header('Location: Weblog.php');
+    exit;
 }
 
-// Make current user available to show admin actions
 require_once __DIR__ . '/auth.php';
 
-// If a markdown placeholder exists for this article, load it as content.
-$mdPath = __DIR__ . '/content/helpdesk/' . $id . '.md';
-// Simple markdown renderer for the placeholders (supports # headings, lists, paragraphs and images).
+// markdown fallback
+$mdPath = __DIR__ . '/content/weblog/' . $id . '.md';
 function render_markdown($md) {
   $lines = preg_split("/\r\n|\n|\r/", $md);
   $html = '';
@@ -47,7 +42,6 @@ function render_markdown($md) {
       $html .= '<li>' . htmlspecialchars($m[1]) . '</li>' . "\n";
       continue;
     }
-    // Images: ![alt](src)
     if (preg_match('/!\[(.*?)\]\((.*?)\)/', $line, $m)) {
       if ($inList) { $html .= "</ul>\n"; $inList = false; }
       $alt = htmlspecialchars($m[1]);
@@ -67,7 +61,6 @@ function render_markdown($md) {
   return $html;
 }
 
-// Only use markdown fallback when the DB content is empty
 if (file_exists($mdPath) && empty(trim($article['content'] ?? ''))) {
   $md = file_get_contents($mdPath);
   $article['content'] = '<div class="article-content">' . render_markdown($md) . '</div>';
@@ -97,20 +90,19 @@ if (file_exists($mdPath) && empty(trim($article['content'] ?? ''))) {
       </div>
       <div class="col-12 col-md-7 col-lg-8">
         <?php
-          // Remove any <img> tags from content so the page shows only the main article image above
           $content = $article['content'] ?? '';
           $content_without_imgs = preg_replace('/<img[^>]*>/i', '', $content);
           echo $content_without_imgs;
         ?>
         <?php if(function_exists('currentUser') && ($u = currentUser()) && $u['role'] === 'admin'): ?>
           <div class="mt-4">
-            <a href="Admin.php?helpdesk_action=edit&hid=<?php echo $article['id']; ?>" class="btn btn-sm btn-outline-primary">Bewerk artikel</a>
+            <a href="Admin.php?weblog_action=edit&wid=<?php echo $article['id']; ?>" class="btn btn-sm btn-outline-primary">Bewerk artikel</a>
             <a href="Admin.php" class="btn btn-sm btn-success">Nieuw artikel</a>
           </div>
         <?php endif; ?>
       </div>
     </article>
-    <p class="mt-4"><a href="Helpdesk.php">&larr; Terug naar Helpdesk</a></p>
+    <p class="mt-4"><a href="Weblog.php">&larr; Terug naar Weblog</a></p>
   </main>
   <?php include 'footer.php'; ?>
 </body>

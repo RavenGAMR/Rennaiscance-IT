@@ -24,7 +24,7 @@
     }
     ?>
     <main class="container py-5">
-      <h1 class="mb-4">Helpdesk artikelen</h1>
+      <h1 class="mb-4 black-heading">Helpdesk artikelen</h1>
 
       <nav class="nav nav-pills justify-content-center mb-5">
         <a class="nav-link active" href="#" data-filter="all">Alle</a>
