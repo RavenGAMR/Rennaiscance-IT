@@ -15,7 +15,7 @@ if(!userHasPurchase($user['id'], 'weblog_access')){
     exit;
 }
 $pdo = getPDO();
-$stmt = $pdo->prepare('SELECT title, content FROM articles WHERE slug = ? LIMIT 1');
+$stmt = $pdo->prepare('SELECT title, content, image, price FROM articles WHERE slug = ? LIMIT 1');
 $stmt->execute([$slug]);
 $article = $stmt->fetch();
 if(!$article){
@@ -39,9 +39,13 @@ if(!$article){
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="card shadow-sm mb-4">
+                    <?php if(!empty($article['image'])): ?>
+                        <div class="article-hero-image" style="background-image:url('uploads/articles/<?php echo htmlspecialchars($article['image']); ?>');"></div>
+                    <?php endif; ?>
                     <div class="card-body">
                         <a href="diensten.php" class="btn btn-secondary btn-sm mb-3">Terug</a>
-                        <h1 class="h3 mb-3"><?php echo htmlspecialchars($article['title']); ?></h1>
+                        <h1 class="h3 mb-2"><?php echo htmlspecialchars($article['title']); ?></h1>
+                        <p class="text-muted mb-3">&euro; <?php echo number_format($article['price'] ?? 0, 2, ',', '.'); ?></p>
                         <div class="article-content"><?php echo nl2br(htmlspecialchars($article['content'])); ?></div>
                     </div>
                 </div>

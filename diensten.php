@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/auth.php';
 $pdo = getPDO();
-$stmt = $pdo->query('SELECT id,title,slug FROM articles ORDER BY id ASC LIMIT 3');
+$stmt = $pdo->query('SELECT id,title,slug,image,price FROM articles ORDER BY id ASC');
 $services = $stmt->fetchAll();
 $user = currentUser();
 ?>
@@ -18,12 +18,17 @@ $user = currentUser();
     <?php include 'navbar.php'; ?>
     <main class="container py-5">
         <h1 class="black-heading">Onze Diensten</h1>
-        <div class="row g-4">
+        <div class="diensten-row g-4">
             <?php foreach($services as $s): ?>
             <div class="col-md-4">
                 <div class="card h-100 shadow-sm">
+                    <?php $img = $s['image'] ?? null; ?>
+                    <?php if(!empty($img)): ?>
+                        <div class="article-card-image" style="background-image:url('uploads/articles/<?php echo htmlspecialchars($img); ?>'); background-size:cover; background-position:center; min-height:180px;"></div>
+                    <?php endif; ?>
                     <div class="card-body d-flex flex-column">
                         <h2 class="black-heading"><?php echo htmlspecialchars($s['title']); ?></h2>
+                        <p class="text-muted mb-2">&euro; <?php echo number_format($s['price'] ?? 0, 2, ',', '.'); ?></p>
                         <p class="text-muted mb-3">Klik voor meer informatie.</p>
                         <div class="mt-auto">
                             <?php
