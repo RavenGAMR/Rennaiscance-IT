@@ -17,14 +17,14 @@ $user = currentUser();
 <body>
     <?php include 'navbar.php'; ?>
     <main class="container py-5">
-        <h1 class="mb-4">Onze Diensten</h1>
+        <h1 class="black-heading">Onze Diensten</h1>
         <div class="row g-4">
             <?php foreach($services as $s): ?>
             <div class="col-md-4">
                 <div class="card h-100 shadow-sm">
                     <div class="card-body d-flex flex-column">
-                        <h2 class="h5"><?php echo htmlspecialchars($s['title']); ?></h2>
-                        <p class="text-muted mb-3">Dienst omschrijving uit database.</p>
+                        <h2 class="black-heading"><?php echo htmlspecialchars($s['title']); ?></h2>
+                        <p class="text-muted mb-3">Klik voor meer informatie.</p>
                         <div class="mt-auto">
                             <?php
                                 $product = $s['slug'];
