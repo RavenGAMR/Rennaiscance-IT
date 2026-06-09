@@ -38,7 +38,7 @@ function currentUser(){
 function requireLogin(){
     if(!currentUser()){
         $ret = $_SERVER['REQUEST_URI'] ?? '/';
-        header('Location: login.php?return=' . urlencode($ret));
+        header('Location: /login-DB/login.php?return=' . urlencode($ret));
         exit;
     }
 }
@@ -46,7 +46,7 @@ function requireLogin(){
 function requireAdmin(){
     $u = currentUser();
     if(!$u || $u['role'] !== 'admin'){
-        header('Location: Index.php');
+        header('Location: /Index.php');
         exit;
     }
 }

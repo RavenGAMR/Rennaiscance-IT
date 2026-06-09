@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/../login-DB/auth.php';
 requireAdmin();
 ?>
 <?php
@@ -35,7 +35,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 }
             }
             if($isAjax) ajaxResponse('ok','created');
-            header('Location: Admin.php?msg=created');
+            header('Location: /pages/Admin.php?msg=created');
             exit;
         }
     }
@@ -60,7 +60,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 }
             }
             if($isAjax) ajaxResponse('ok','updated');
-            header('Location: Admin.php?msg=updated');
+            header('Location: /pages/Admin.php?msg=updated');
             exit;
         }
     }
@@ -70,7 +70,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $stmt = $pdo->prepare('DELETE FROM articles WHERE id = ?');
             $stmt->execute([$id]);
             if($isAjax) ajaxResponse('ok','deleted');
-            header('Location: Admin.php?msg=deleted');
+            header('Location: /pages/Admin.php?msg=deleted');
             exit;
         }
     }
@@ -96,7 +96,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 }
             }
             if($isAjax) ajaxResponse('ok','help_created');
-            header('Location: Admin.php?msg=help_created'); exit;
+            header('Location: /pages/Admin.php?msg=help_created'); exit;
         }
     }
     if($action === 'update_helpdesk'){
@@ -120,7 +120,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 }
             }
             if($isAjax) ajaxResponse('ok','help_updated');
-            header('Location: Admin.php?msg=help_updated'); exit;
+            header('Location: /pages/Admin.php?msg=help_updated'); exit;
         }
     }
     if($action === 'delete_helpdesk'){
@@ -129,7 +129,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $stmt = $pdo->prepare('DELETE FROM helpdesk_articles WHERE id = ?');
             $stmt->execute([$id]);
             if($isAjax) ajaxResponse('ok','help_deleted');
-            header('Location: Admin.php?msg=help_deleted'); exit;
+            header('Location: /pages/Admin.php?msg=help_deleted'); exit;
         }
     }
     // Weblogs CRUD
@@ -154,7 +154,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 }
             }
             if($isAjax) ajaxResponse('ok','weblog_created');
-            header('Location: Admin.php?msg=weblog_created'); exit;
+            header('Location: /pages/Admin.php?msg=weblog_created'); exit;
         }
     }
     if($action === 'update_weblog'){
@@ -178,7 +178,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 }
             }
             if($isAjax) ajaxResponse('ok','weblog_updated');
-            header('Location: Admin.php?msg=weblog_updated'); exit;
+            header('Location: /pages/Admin.php?msg=weblog_updated'); exit;
         }
     }
     if($action === 'delete_weblog'){
@@ -187,7 +187,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $stmt = $pdo->prepare('DELETE FROM weblogs WHERE id = ?');
             $stmt->execute([$id]);
             if($isAjax) ajaxResponse('ok','weblog_deleted');
-            header('Location: Admin.php?msg=weblog_deleted'); exit;
+            header('Location: /pages/Admin.php?msg=weblog_deleted'); exit;
         }
     }
     if($action === 'changerole'){
@@ -196,19 +196,19 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $current = currentUser();
         if(!$uid || !$current){
             if($isAjax) ajaxResponse('error','rolefail');
-            header('Location: Admin.php?msg=rolefail'); exit;
+            header('Location: /pages/Admin.php?msg=rolefail'); exit;
         }
         // Prevent admin changing their own role to avoid lockout
         if($uid == $current['id']){
             if($isAjax) ajaxResponse('error','cantself');
-            header('Location: Admin.php?msg=cantself'); exit;
+            header('Location: /pages/Admin.php?msg=cantself'); exit;
         }
         $allowed = ['user','admin'];
         if(!in_array($newRole, $allowed, true)) $newRole = 'user';
         $ustmt = $pdo->prepare('UPDATE users SET role = ? WHERE id = ?');
         $ustmt->execute([$newRole, $uid]);
         if($isAjax) ajaxResponse('ok','rolechanged');
-        header('Location: Admin.php?msg=rolechanged'); exit;
+        header('Location: /pages/Admin.php?msg=rolechanged'); exit;
     }
     
 }
@@ -403,12 +403,12 @@ $current = currentUser();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rennaiscance IT</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
-  <link rel="stylesheet" href="Style.css">
+    <link rel="stylesheet" href="/stylesheet/Style.css">
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
 </head>
 <body>
-    <?php include 'navbar.php'; ?>
+    <?php include __DIR__ . '/../components/navbar.php'; ?>
     <main class="container py-5">
         <h1 class="black-heading">Admin - Diensten beheer</h1>
         <?php if(!empty($_GET['msg'])): ?>
@@ -501,7 +501,7 @@ $current = currentUser();
                                 </div>
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-primary" type="submit">Opslaan</button>
-                                    <a href="Admin.php" class="btn btn-secondary">Annuleer</a>
+                                    <a href="/pages/Admin.php" class="btn btn-secondary">Annuleer</a>
                                 </div>
                             </form>
                         <?php else: ?>
@@ -652,7 +652,7 @@ $current = currentUser();
                                         </div>
                                         <div class="d-grid gap-2">
                                             <button class="btn btn-primary" type="submit">Opslaan</button>
-                                            <a href="Admin.php" class="btn btn-secondary">Annuleer</a>
+                                            <a href="/pages/Admin.php" class="btn btn-secondary">Annuleer</a>
                                         </div>
                                     </form>
                                 <?php else: ?>
@@ -863,6 +863,6 @@ $current = currentUser();
             });
             </script>
 
-            <?php include 'footer.php'; ?>
+            <?php include __DIR__ . '/../components/footer.php'; ?>
 </body>
 </html>
