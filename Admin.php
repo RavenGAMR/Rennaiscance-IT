@@ -12,6 +12,11 @@ function ajaxResponse($status, $msg){
     echo json_encode(['status' => $status, 'msg' => $msg]);
     exit;
 }
+function ajaxError($msg = 'action_failed'){
+    if($GLOBALS['isAjax']) ajaxResponse('error', $msg);
+    header('Location: Admin.php?msg=' . urlencode($msg));
+    exit;
+}
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $action = $_POST['action'] ?? '';
     if($action === 'create'){
@@ -210,7 +215,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         if($isAjax) ajaxResponse('ok','rolechanged');
         header('Location: Admin.php?msg=rolechanged'); exit;
     }
-    
+    if($isAjax) ajaxError('invalid_request');
+    header('Location: Admin.php?msg=invalid_request');
+    exit;
 }
 // Helpers for edit/create views
 $editing = false;
@@ -789,8 +796,9 @@ $current = currentUser();
                 const modalEl = document.getElementById('ajaxModal');
                 const bsModal = new bootstrap.Modal(modalEl);
 
+                const modalBody = modalEl.querySelector('.modal-body');
                 function showMessage(msg){
-                    modalEl.querySelector('.modal-body').textContent = msg;
+                    modalBody.textContent = msg;
                     bsModal.show();
                 }
 
@@ -798,23 +806,32 @@ $current = currentUser();
                     if(!form) return;
                     form.addEventListener('submit', function(e){
                         e.preventDefault();
-                        const fd = new FormData(form);
-                        fetch(form.action || window.location.href, {
+                        const requestUrl = new URL(form.getAttribute('action') || window.location.href, window.location.href).href;
+                        fetch(requestUrl, {
                             method: 'POST',
-                            body: fd,
+                            body: new FormData(form),
                             headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        }).then(r => r.json()).then(data => {
-                            modalEl.querySelector('.modal-body').textContent = data.msg || 'Klaar';
-                            bsModal.show();
+                        }).then(response => response.text().then(text => ({ response, text }))).then(({ response, text }) => {
+                            if (!response.ok) {
+                                showMessage('Fout ' + response.status + ' op ' + requestUrl + '\n' + text);
+                                return;
+                            }
+                            try {
+                                const data = JSON.parse(text);
+                                showMessage(data.msg || 'Klaar');
+                                if (data.status === 'ok') {
+                                    setTimeout(() => window.location.reload(), 500);
+                                }
+                            } catch (err) {
+                                showMessage(text || 'Er is een fout opgetreden');
+                            }
                         }).catch(err => {
-                            modalEl.querySelector('.modal-body').textContent = 'Er is een fout opgetreden';
-                            bsModal.show();
+                            showMessage('Er is een fout opgetreden: ' + err.message);
                         });
                     });
                 }
 
-                // Bind existing forms in the page (main area)
-                document.querySelectorAll('main form[method="post"]').forEach(bindAjaxForm);
+                document.querySelectorAll('main form[data-ajax="true"]').forEach(bindAjaxForm);
 
                 // Handle clicks on edit links to load form into modal
                 document.addEventListener('click', function(e){
@@ -842,7 +859,8 @@ $current = currentUser();
                     }
                     modalEl.querySelector('.modal-body').textContent = 'Laden...';
                     bsModal.show();
-                    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    const requestUrl = new URL(url, window.location.href).href;
+                    fetch(requestUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                         .then(r => r.text())
                         .then(html => {
                             modalEl.querySelector('.modal-body').innerHTML = html;

@@ -26,51 +26,10 @@ require_once __DIR__ . '/auth.php';
 
 // If a markdown placeholder exists for this article, load it as content.
 $mdPath = __DIR__ . '/content/helpdesk/' . $id . '.md';
-// Simple markdown renderer for the placeholders (supports # headings, lists, paragraphs and images).
-function render_markdown($md) {
-  $lines = preg_split("/\r\n|\n|\r/", $md);
-  $html = '';
-  $inList = false;
-  foreach ($lines as $line) {
-    if (preg_match('/^# (.+)/', $line, $m)) {
-      if ($inList) { $html .= "</ul>\n"; $inList = false; }
-      $html .= '<h1>' . htmlspecialchars($m[1]) . '</h1>' . "\n";
-      continue;
-    }
-    if (preg_match('/^## (.+)/', $line, $m)) {
-      if ($inList) { $html .= "</ul>\n"; $inList = false; }
-      $html .= '<h2>' . htmlspecialchars($m[1]) . '</h2>' . "\n";
-      continue;
-    }
-    if (preg_match('/^- (.+)/', $line, $m)) {
-      if (!$inList) { $inList = true; $html .= "<ul>\n"; }
-      $html .= '<li>' . htmlspecialchars($m[1]) . '</li>' . "\n";
-      continue;
-    }
-    // Images: ![alt](src)
-    if (preg_match('/!\[(.*?)\]\((.*?)\)/', $line, $m)) {
-      if ($inList) { $html .= "</ul>\n"; $inList = false; }
-      $alt = htmlspecialchars($m[1]);
-      $src = htmlspecialchars($m[2]);
-      $html .= '<p><img src="' . $src . '" alt="' . $alt . '" class="img-fluid rounded-3 my-3" /></p>' . "\n";
-      continue;
-    }
-    if (trim($line) === '') {
-      if ($inList) { $html .= "</ul>\n"; $inList = false; }
-      $html .= "\n";
-      continue;
-    }
-    if ($inList) { $html .= "</ul>\n"; $inList = false; }
-    $html .= '<p>' . htmlspecialchars($line) . '</p>' . "\n";
-  }
-  if ($inList) { $html .= "</ul>\n"; }
-  return $html;
-}
-
 // Only use markdown fallback when the DB content is empty
 if (file_exists($mdPath) && empty(trim($article['content'] ?? ''))) {
   $md = file_get_contents($mdPath);
-  $article['content'] = '<div class="article-content">' . render_markdown($md) . '</div>';
+  $article['content'] = '<div class="article-content">' . $md . '</div>';
 }
 ?>
 <!DOCTYPE html>
@@ -97,10 +56,8 @@ if (file_exists($mdPath) && empty(trim($article['content'] ?? ''))) {
       </div>
       <div class="col-12 col-md-7 col-lg-8">
         <?php
-          // Remove any <img> tags from content so the page shows only the main article image above
           $content = $article['content'] ?? '';
-          $content_without_imgs = preg_replace('/<img[^>]*>/i', '', $content);
-          echo $content_without_imgs;
+          echo $content;
         ?>
         <?php if(function_exists('currentUser') && ($u = currentUser()) && $u['role'] === 'admin'): ?>
           <div class="mt-4">
@@ -110,7 +67,7 @@ if (file_exists($mdPath) && empty(trim($article['content'] ?? ''))) {
         <?php endif; ?>
       </div>
     </article>
-    <p class="mt-4"><a href="Helpdesk.php">&larr; Terug naar Helpdesk</a></p>
+    <p class="mt-4"><a href="Helpdesk.php">Terug naar Helpdesk</a></p>
   </main>
   <?php include 'footer.php'; ?>
 </body>
